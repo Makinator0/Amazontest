@@ -7,8 +7,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeOptions;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
-import java.io.IOException;
+
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
@@ -20,12 +21,11 @@ public class AmazonBookScraper {
     private Random random;
 
 
-    public AmazonBookScraper(String driverPath) {
-        System.setProperty("webdriver.chrome.driver", driverPath);
-
+    public AmazonBookScraper() {
+        WebDriverManager.chromedriver().setup(); // Автоматическая настройка пути к chromedriver
         ChromeOptions options = new ChromeOptions();
         // Имитация поведения разных браузеров
-        options.addArguments("user-agent=Mozilla/5 (Windows NT 10.0; Win64; x64)  Chrome/124.0.6367.119");
+        options.addArguments("user-agent=Mozilla/5 (Windows NT 10.0; Win64; x64)   Chrome/91.0.4472.124");
         // Включение поддержки cookies
         options.addArguments("enable-automation");
         options.addArguments("--no-sandbox");
@@ -79,7 +79,7 @@ public class AmazonBookScraper {
 
 
     public static void main(String[] args) {
-        AmazonBookScraper scraper = new AmazonBookScraper("C:\\Users\\maksi\\OneDrive\\Рабочий стол\\chromedriver-win64\\chromedriver.exe");
+        AmazonBookScraper scraper = new AmazonBookScraper();
         try {
             List<Book> books = scraper.scrapeBooks("Books", "Java");
             // Выводим все книги в списке
