@@ -6,30 +6,58 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.chrome.ChromeOptions;
 
-
+import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AmazonBookScraper {
     private WebDriver driver;
     private WebDriverWait wait;
+    private Random random;
+
 
     public AmazonBookScraper(String driverPath) {
         System.setProperty("webdriver.chrome.driver", driverPath);
-        this.driver = new ChromeDriver();
+
+        ChromeOptions options = new ChromeOptions();
+        // Имитация поведения разных браузеров
+        options.addArguments("user-agent=Mozilla/5 (Windows NT 10.0; Win64; x64)  Chrome/124.0.6367.119");
+        // Включение поддержки cookies
+        options.addArguments("enable-automation");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-browser-side-navigation");
+        options.addArguments("--disable-gpu");
+
+        this.driver = new ChromeDriver(options);
         this.wait = new WebDriverWait(driver, 20);
+        this.random = new Random();
     }
 
     public void close() {
         if (driver != null) {
-            driver.quit();
+            // Получаем список всех открытых вкладок
+            ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
+            // Закрываем до 10 вкладок
+            for (int i = 0; i < Math.min(tabs.size(), 10); i++) {
+                driver.switchTo().window(tabs.get(i)); // Переключаемся на каждую вкладку
+                driver.close(); // Закрываем вкладку
+            }
+            driver.quit(); // Закрываем все оставшиеся окна и завершаем сеанс WebDriver
         }
     }
 
     public List<Book> scrapeBooks(String category, String searchTerm) {
+        // Рандомная задержка перед действиями
+        randomSleep();
         AmazonPageNavigator navigator = new AmazonPageNavigator(driver);
         navigator.navigateToHomePage();
+        randomSleep();
         navigator.selectCategory(category);
 
         AmazonSearchPageHandler searchPageHandler = new AmazonSearchPageHandler(driver, wait);
@@ -40,13 +68,21 @@ public class AmazonBookScraper {
         return bookExtractor.extractBooks();
     }
 
+    private void randomSleep() {
+        try {
+            // Рандомная задержка от 1 до 5 секунд
+            TimeUnit.SECONDS.sleep(random.nextInt(5) + 1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+
     public static void main(String[] args) {
         AmazonBookScraper scraper = new AmazonBookScraper("C:\\Users\\maksi\\OneDrive\\Рабочий стол\\chromedriver-win64\\chromedriver.exe");
         try {
             List<Book> books = scraper.scrapeBooks("Books", "Java");
-
             // Выводим все книги в списке
-            System.out.println("All Books:");
             for (Book book : books) {
                 System.out.println("Title: " + book.getTitle() + ", Author: " + book.getAuthor() + ", Price: " + book.getPrice() + ", Best Seller: " + book.isBestSeller());
             }
@@ -69,13 +105,7 @@ class AmazonPageNavigator {
 
     public void navigateToHomePage() {
         driver.get("https://www.amazon.com/");
-        try {
-            // Wait for 10 seconds to manually solve CAPTCHA if present
-            Thread.sleep(10000); // 10000 milliseconds = 10 seconds
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Restore interrupted status
-            throw new RuntimeException("Thread was interrupted", e);
-        }
+
     }
 
     public void selectCategory(String category) {
