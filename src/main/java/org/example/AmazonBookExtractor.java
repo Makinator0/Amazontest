@@ -73,8 +73,8 @@ public class AmazonBookExtractor {
                         priceElement.findElement(By.cssSelector(".a-price-fraction")).getText();
             }
 
-            isBestSeller = !bookElement.findElements(By.cssSelector(".a-badge-label")).isEmpty() &&
-                    bookElement.findElement(By.cssSelector(".a-badge-label")).getText().contains("Лідер продажу");
+            isBestSeller = !bookElement.findElements(By.cssSelector(".a-badge .a-badge-text")).isEmpty() &&
+                    bookElement.findElement(By.cssSelector(".a-badge .a-badge-text")).getText().contains("Best Seller");
         } catch (NoSuchElementException e) {
             System.err.println("Element not found for book: " + title);
         }
@@ -82,4 +82,3 @@ public class AmazonBookExtractor {
         return new Book(title, author, price, isBestSeller);
     }
 }
-
