@@ -17,21 +17,20 @@ public class AmazonBookExtractor {
 
     public List<Book> extractBooks() {
         List<Book> books = new ArrayList<>();
-
         List<WebElement> bookElements = driver.findElements(By.cssSelector(".s-result-item.s-asin"));
         for (WebElement bookElement : bookElements) {
             try {
                 books.add(extractBookData(bookElement));
             } catch (Exception e) {
-                System.err.println("Failed to extract book data: " + e.getMessage());
+                System.err.println("Не вдалося видобути дані книги: " + e.getMessage());
             }
         }
         return books;
     }
 
     private Book extractBookData(WebElement bookElement) {
-        String title = "Information missing";
-        String author = "Unknown";
+        String title = "Відсутня інформація";
+        String author = "Невідомий";
         String price = "N/A";
         boolean isBestSeller = false;
 
@@ -43,15 +42,12 @@ public class AmazonBookExtractor {
                 for (int i = 0; i < authorElements.size(); i++) {
                     WebElement element = authorElements.get(i);
                     String authorText = element.getText().trim();
-
                     if (i == 0 && authorText.startsWith("|")) {
                         authorText = authorText.substring(1).trim();
                     }
-
-                    if (authorText.equalsIgnoreCase("and") || authorText.equalsIgnoreCase(",") || authorText.equalsIgnoreCase("by")) {
+                    if (authorText.equalsIgnoreCase("and")  || authorText.equalsIgnoreCase(",")  || authorText.equalsIgnoreCase("by")) {
                         continue;
                     }
-
                     if (authorText.equals("|") || authorText.equals("e")) {
                         break;
                     }
@@ -59,7 +55,6 @@ public class AmazonBookExtractor {
                         authors.append(", ");
                     }
                     authors.append(authorText);
-
                     if (i + 1 < authorElements.size()) {
                         String nextText = authorElements.get(i + 1).getText().trim();
                         if (Character.isDigit(nextText.charAt(0))) {
@@ -69,9 +64,8 @@ public class AmazonBookExtractor {
                 }
                 author = authors.toString();
             } else {
-                System.err.println("Author details not found for book: " + title);
+                System.err.println("Деталі про автора книги не знайдено: " + title);
             }
-
 
             WebElement priceElement = bookElement.findElement(By.cssSelector(".a-price"));
             if (priceElement != null) {
@@ -80,10 +74,11 @@ public class AmazonBookExtractor {
             }
 
             isBestSeller = !bookElement.findElements(By.cssSelector(".a-badge-label")).isEmpty() &&
-                    bookElement.findElement(By.cssSelector(".a-badge-label")).getText().contains("Best Seller");
+                    bookElement.findElement(By.cssSelector(".a-badge-label")).getText().contains("Лідер продажу");
         } catch (NoSuchElementException e) {
             System.err.println("Element not found for book: " + title);
         }
+
         return new Book(title, author, price, isBestSeller);
     }
 }
