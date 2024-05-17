@@ -1,18 +1,38 @@
-package org.example;
+package org.example.BrowserPages;
 
+import org.example.Book;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmazonBookExtractor {
+public class AmazonSearchPage {
     private WebDriver driver;
+    private WebDriverWait wait;
 
-    public AmazonBookExtractor(WebDriver driver) {
+    public AmazonSearchPage(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
+        this.wait = wait;
+    }
+
+    public void enterSearchTerm(String searchTerm) {
+        WebElement searchBox = driver.findElement(By.id("twotabsearchtextbox"));
+        searchBox.sendKeys(searchTerm);
+        searchBox.submit();
+    }
+
+    public void waitForSearchResults() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".s-result-item")));
+    }
+
+    public List<Book> searchForBooks(String searchTerm) {
+        enterSearchTerm(searchTerm);
+        waitForSearchResults();
+        return extractBooks();
     }
 
     public List<Book> extractBooks() {
@@ -45,10 +65,10 @@ public class AmazonBookExtractor {
                     if (i == 0 && authorText.startsWith("|")) {
                         authorText = authorText.substring(1).trim();
                     }
-                    if (authorText.equalsIgnoreCase("and")  || authorText.equalsIgnoreCase(",")  || authorText.equalsIgnoreCase("by")) {
+                    if ( authorText.equalsIgnoreCase("by")) {
                         continue;
                     }
-                    if (authorText.equals("|") || authorText.equals("e")) {
+                    if (authorText.equals("|") || authorText.equals("e") || authorText.equalsIgnoreCase("and")  || authorText.equalsIgnoreCase(",")) {
                         break;
                     }
                     if (authors.length() > 0) {
