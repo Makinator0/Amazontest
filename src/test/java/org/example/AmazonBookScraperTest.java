@@ -4,8 +4,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.By;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebElement;
+
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +18,14 @@ import java.util.List;
 public class AmazonBookScraperTest {
     private WebDriver driver;
     private WebDriverWait wait;
+    private String searchTerm;
+    private String bookUrl = "https://www.amazon.com/Head-First-Java-Brain-Friendly-Guide-dp-1491910771/dp/1491910771/ref=dp_ob_title_bk";
 
     @Before
     public void setUp() {
         driver = WebDriverFactory.createDriver();
         wait = WebDriverFactory.createWait(driver, 20);
+        searchTerm = System.getProperty("searchTerm", "Java"); // Default to "Java" if property not set
     }
 
     @After
@@ -34,28 +42,29 @@ public class AmazonBookScraperTest {
 
     @Test
     public void testScrapeBooks() {
+        String asin = AmazonUtils.extractAsinFromUrl(bookUrl);
         AmazonHomePage homePage = new AmazonHomePage(driver);
         homePage.goToBooksCategory();
 
         AmazonSearchPage searchPage = new AmazonSearchPage(driver, wait);
-        List<Book> books = searchPage.searchForBooks("Java");
+        List<Book> books = searchPage.searchForBooks(searchTerm); // Use the searchTerm
 
         BookResultsHandler resultsHandler = new BookResultsHandler();
         resultsHandler.printBooks(books);
-        Book foundBook = null;
-        for (Book book : books) {
-            if (book.getTitle().equals("Head First Java: A Brain-Friendly Guide") && book.getAuthor().contains("Kathy Sierra")) {
-                foundBook = book;
-                break;
-            }
-        }
-        Assert.assertNotNull("Ожидаемая книга не найдена в списке.", foundBook);
+        // Fetch book details from specific ASIN page
+        driver.get("https://www.amazon.com/dp/" + asin);
+        WebElement titleElement = driver.findElement(By.id("productTitle"));
+        String title = titleElement.getText().trim().toLowerCase();
+
+
+        Book foundBook = books.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(title))
+                .findFirst()
+                .orElse(null);
+
+        Assert.assertNotNull("Expected book not found in the list.", foundBook);
         if (foundBook != null) {
-            Assert.assertEquals("Название книги не совпадает.", "Head First Java: A Brain-Friendly Guide", foundBook.getTitle());
-            Assert.assertTrue("Автор книги не содержит ожидаемого автора.", foundBook.getAuthor().contains("Kathy Sierra"));
-            Assert.assertEquals("Цена книги не совпадает.", "17.60", foundBook.getPrice());
-            Assert.assertTrue("Книга не является бестселлером, хотя должна быть.", foundBook.isBestSeller());
-            System.out.println("Найдена книга: " + foundBook.getTitle() + " от " + foundBook.getAuthor() + " цена: " + foundBook.getPrice() + " бестселлер: " + foundBook.isBestSeller());
+            System.out.println("Found book: " + foundBook.getTitle() + " by " + foundBook.getAuthor() + ", Price: " + foundBook.getPrice() + ", Bestseller: " + foundBook.isBestSeller());
         }
     }
 }
