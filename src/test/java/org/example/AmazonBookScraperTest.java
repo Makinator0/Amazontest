@@ -31,14 +31,10 @@ public class AmazonBookScraperTest {
 
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=Mozilla Chrome/ 124.0.6367.91");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-browser-side-navigation");
-        options.addArguments("--disable-gpu");
+        options.addArguments("user-agent=Mozilla Chrome/ 125.0.6422.61");
+        options.setBinary("C:\\Users\\maksi\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe");
         driver = new ChromeDriver(options);
+
         wait = new WebDriverWait(driver, 20);
         searchTerm = System.getProperty("searchTerm", "Java");
     }
