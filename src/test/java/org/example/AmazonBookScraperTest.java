@@ -1,6 +1,6 @@
 package org.example;
 
-
+import io.qameta.allure.*;
 import org.example.BrowserPages.AmazonHomePage;
 import org.example.BrowserPages.AmazonSearchPage;
 import org.example.BrowserPages.BookDetailsPage;
@@ -8,18 +8,17 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import io.github.bonigarcia.wdm.WebDriverManager;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Epic("Amazon Book Scraper")
+@Feature("Search and extract book data from Amazon")
 public class AmazonBookScraperTest {
     private WebDriver driver;
     private WebDriverWait wait;
@@ -28,13 +27,11 @@ public class AmazonBookScraperTest {
 
     @Before
     public void setUp() {
-
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("user-agent=Mozilla Chrome/ 125.0.6422.61");
         options.setBinary("C:\\Users\\maksi\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe");
         driver = new ChromeDriver(options);
-
         wait = new WebDriverWait(driver, 20);
         searchTerm = System.getProperty("searchTerm", "Java");
     }
@@ -52,11 +49,15 @@ public class AmazonBookScraperTest {
     }
 
     @Test
+    @Description("Test for scraping books from Amazon and verifying specific book details")
+    @Severity(SeverityLevel.CRITICAL)
     public void testScrapeBooks() {
         AmazonHomePage homePage = new AmazonHomePage(driver);
         homePage.goToBooksCategory();
+
         AmazonSearchPage searchPage = new AmazonSearchPage(driver, wait);
         List<Book> books = searchPage.searchForBooks(searchTerm);
+
         String asin = BookDetailsPage.extractAsinFromUrl(bookUrl);
         Assert.assertNotNull("ASIN should be extracted from URL", asin);
 
@@ -75,5 +76,4 @@ public class AmazonBookScraperTest {
             System.out.println("Found book: " + foundBook.getTitle() + " by " + foundBook.getAuthor() + ", Price: " + foundBook.getPrice() + ", Bestseller: " + foundBook.isBestSeller());
         }
     }
-
 }
