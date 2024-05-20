@@ -16,6 +16,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class AmazonBookScraperTest {
 
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=Mozilla Chrome/125.0.6422.60");
+        options.addArguments("user-agent=Mozilla Chrome/ 124.0.6367.91");
         options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-infobars");
