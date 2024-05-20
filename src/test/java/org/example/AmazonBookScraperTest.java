@@ -30,7 +30,7 @@ public class AmazonBookScraperTest {
 
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("user-agent=Mozilla Chrome/124.0.6367.119");
+        options.addArguments("user-agent=Mozilla Chrome/125.0.6422.60");
         options.addArguments("--disable-extensions");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-infobars");
