@@ -1,6 +1,6 @@
 package org.example.BrowserPages;
 
-
+import io.qameta.allure.Step;
 import org.example.Book;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -20,22 +20,26 @@ public class AmazonSearchPage {
         this.wait = wait;
     }
 
+    @Step("Enter search term: {searchTerm}")
     public void enterSearchTerm(String searchTerm) {
         WebElement searchBox = driver.findElement(By.id("twotabsearchtextbox"));
         searchBox.sendKeys(searchTerm);
         searchBox.submit();
     }
 
+    @Step("Wait for search results")
     public void waitForSearchResults() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".s-result-item")));
     }
 
+    @Step("Search for books with term: {searchTerm}")
     public List<Book> searchForBooks(String searchTerm) {
         enterSearchTerm(searchTerm);
         waitForSearchResults();
         return extractBooks();
     }
 
+    @Step("Extract books data from search results")
     public List<Book> extractBooks() {
         List<Book> books = new ArrayList<>();
         List<WebElement> bookElements = driver.findElements(By.cssSelector(".s-result-item.s-asin"));
@@ -49,6 +53,7 @@ public class AmazonSearchPage {
         return books;
     }
 
+    @Step("Extract data for a single book")
     private Book extractBookData(WebElement bookElement) {
         String title = "Відсутня інформація";
         String author = "Невідомий";
