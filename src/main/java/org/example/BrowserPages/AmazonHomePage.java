@@ -1,5 +1,4 @@
 package org.example.BrowserPages;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 

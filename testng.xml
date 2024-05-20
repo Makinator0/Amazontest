@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="AmazonBookScraperSuite">
+    <test name="AmazonBookScraperTest">
+        <classes>
+            <class name="org.example.AmazonBookScraperTest"/>
+        </classes>
+    </test>
+</suite>
