@@ -1,18 +1,20 @@
 package org.example;
 
-import io.qameta.allure.*;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.example.BrowserPages.AmazonHomePage;
 import org.example.BrowserPages.AmazonSearchPage;
 import org.example.BrowserPages.BookDetailsPage;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import io.qameta.allure.Step;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ public class AmazonBookScraperTest {
     private String searchTerm;
     private String bookUrl = "https://www.amazon.com/Python-Crash-Course-Eric-Matthes/dp/1718502702/ref=sr_1_1?crid=12UW02UD2RGIE&dib=eyJ2IjoiMSJ9.ST-6MoO7OqvlsneC5UZBvVCOfb7J2YblNpiogupHg9laMGgEBQ3mCY-r9noo-DVMfcdBJ-QYv8Dy2pMw5G6IbqXizW-Za_c7nEqfw4NAuq8aGjHk7H_88C_DBs7ss_mHVynTySQXBCPwHunzWwkBz5Kegu-sx5iyQ3QoVtdHM_sIkc5XgjKXtfL_x3CQsf0QB3ZymvDDIS1HqdeiZUtYqd922Mwm4FfuZSSfsulshKM.w8j8RFs_K-1xOXhmwSrRvkTWkr6E6zgDxgy1w7mKfPw&dib_tag=se&keywords=python&qid=1715954866&s=books&sprefix=Pyt%2Cstripbooks-intl-ship%2C192&sr=1-1";
 
-    @Before
+    @BeforeTest
     public void setUp() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
@@ -36,7 +38,7 @@ public class AmazonBookScraperTest {
         searchTerm = System.getProperty("searchTerm", "Java");
     }
 
-    @After
+    @AfterTest
     public void tearDown() {
         if (driver != null) {
             ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
@@ -48,9 +50,8 @@ public class AmazonBookScraperTest {
         }
     }
 
+    @Step("Scrape books from Amazon")
     @Test
-    @Description("Test for scraping books from Amazon and verifying specific book details")
-    @Severity(SeverityLevel.CRITICAL)
     public void testScrapeBooks() {
         AmazonHomePage homePage = new AmazonHomePage(driver);
         homePage.goToBooksCategory();
@@ -71,7 +72,7 @@ public class AmazonBookScraperTest {
                 .findFirst()
                 .orElse(null);
 
-        Assert.assertTrue("Expected book should be in the list of books", books.contains(foundBook));
+        Assert.assertTrue(books.contains(foundBook), "Expected book should be in the list of books");
         if (foundBook != null) {
             System.out.println("Found book: " + foundBook.getTitle() + " by " + foundBook.getAuthor() + ", Price: " + foundBook.getPrice() + ", Bestseller: " + foundBook.isBestSeller());
         }
